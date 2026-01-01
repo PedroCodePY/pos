@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 #from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy.ext.declarative import declarative_base
 import os
 
 URL_DATABASE = "{}://{}:{}@{}:{}/{}".format(
@@ -12,7 +11,7 @@ URL_DATABASE = "{}://{}:{}@{}:{}/{}".format(
     os.getenv("DB_PORT"),
     os.getenv("DB_NAME"),
 )
-engine = create_engine(URL_DATABASE, pool_size=50, echo=False)
+engine = create_engine(URL_DATABASE, echo=True)
 session = sessionmaker(bind=engine)
 Base = declarative_base()
 print(engine.url)

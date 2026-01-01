@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from ..database import Base
 
 # Model representing a product in the system
 class Product(BaseModel):
