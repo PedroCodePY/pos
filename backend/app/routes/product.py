@@ -14,3 +14,6 @@ async def get_product(product_id: str):
 async def add_product(product: Product):
     pass
 
+@router.put("/update/{product_id}", response_model=Product)
+async def update_product(product_id: str, product: Product):
+    pass

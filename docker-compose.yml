@@ -1,7 +1,9 @@
 services:
-  backend:
-    build: ./backend
+  pos-app:
+    container_name: pos-app
+    build: .
+    environment:
+      env_file:
+        - ../.env
     ports:
-      - "8000:8000"
-    env_file:
-      - .env
+      - "6711:8000"
