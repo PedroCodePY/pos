@@ -1,18 +1,21 @@
-from pydantic import BaseModel
-from typing import Optional
+from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
+from datetime import datetime
 
-# Model representing a product in the system
-class Product(BaseModel):
-    id: str
-    name: str
-    description: str
-    price: float
-    in_stock: bool
+class Product(Base):
+    __tablename__ = "tbl_products"
+    __table_args__ = {"extend_existing": True}
 
-# Model for updating product details
-class ProductUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    price: Optional[float] = None
-    in_stock: Optional[bool] = None
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(nullable=False)
+    description: Mapped[str] = mapped_column(nullable=False)
+    price: Mapped[float] = mapped_column(nullable=False)
+    in_stock: Mapped[bool] = mapped_column(nullable=False)
+    product_image: Mapped[str] = mapped_column(nullable=True)
+    owner_id: Mapped[int] = mapped_column(nullable=False)
+    owner: Mapped[str] = mapped_column(nullable=False)
+    date_created: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
+    date_updated: Mapped[datetime] = mapped_column(nullable=True, onupdate=datetime.utcnow)
+
+    def __repr__(self) -> str:
+        return f"<Product(id={self.id}, name={self.name}, description={self.description}, price={self.price}, in_stock={self.in_stock}, product_image={self.product_image}, owner_id={self.owner_id}, owner={self.owner}, date_created={self.date_created}, date_updated={self.date_updated})>"

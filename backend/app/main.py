@@ -1,6 +1,6 @@
 #imports
 from fastapi import FastAPI
-from app.routes import auth, product
+from app.routes import auth, product, transaction
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -13,3 +13,4 @@ def read_root():
 # Include authentication routes
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(product.router, prefix="/product", tags=["product"])
+app.include_router(transaction.router, prefix="/transaction", tags=["transaction"])

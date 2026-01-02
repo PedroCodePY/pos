@@ -4,33 +4,48 @@ from app.schemas.user import UserLogin, UserRegister, UserUpdate, CashierLogin, 
 from app.models.user import User
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select
+from app.database import engine
+from http import HTTPStatus
 
+#API router for authentication
 router = APIRouter()
+session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
-class crud():
-    async def get_user(self, async_session: async_sessionmaker[AsyncSession]):
-        async with async_session() as session:
-            statement = select(User).group_by(User.id)
-            result = await session.execute(statement)
-            return result.scalars()
-        
-    async def add_user(self, async_session: async_sessionmaker[AsyncSession]):
+#Authentication system class
+class system():
+    async def register(self, async_session: async_sessionmaker[AsyncSession], user: User):
         async with async_session() as session:
             session.add(user)
             await session.commit()
             await session.refresh(user)
             return user
 
+    async def login(self, async_session: async_sessionmaker[AsyncSession], user: User):
+        async with async_session() as session:
+            statement = select(User).where(User.username == user.username, User.password == user.password)
+            result = await session.execute(statement)
+            return result.scalars()
+        
+db = system()
+
 #admin routes
 #Login route
-@router.post("/login")
-def login(user: UserLogin = Path(description="User login")):
-    return user, {"message": "Login successful"}
+@router.post("/login", status_code=HTTPStatus.OK)
+def login(login_data: UserLogin = Path(description="User login")):
+    pass
 
 #Registration route
-@router.post("/register")
-def register(user: UserRegister = Path(description="User registration")):
-    return user, {"message": "Registration successful"}
+@router.post("/register", status_code=HTTPStatus.CREATED)
+def register(register_data: UserRegister = Path(description="User registration")):
+    new_user = User(
+        name=register_data.name,
+        username=register_data.username,
+        email=register_data.email,
+        hashed_password=register_data.hashed_password
+    )
+
+    user = db.register(session, new_user)
+    return user
 
 #Update route
 @router.put("/update/user")
