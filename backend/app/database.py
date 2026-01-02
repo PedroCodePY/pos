@@ -1,6 +1,5 @@
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
-#from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 import os
 
 #URL for the database connection
@@ -14,8 +13,7 @@ URL_DATABASE = "{}://{}:{}@{}:{}/{}".format(
 )
 
 #Create the database engine and session
-engine = create_engine(URL_DATABASE, echo=True)
-session = sessionmaker(bind=engine)
-Base = declarative_base()
+engine = create_async_engine(URL_DATABASE, echo=True)
 
-print(engine.url)
+class Base(DeclarativeBase):
+    pass

@@ -1,13 +1,18 @@
-from sqlalchemy import Column, String, Boolean, Integer
+from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
+from datetime import datetime
 
-#database table for users
-class UserDB(Base):
-    __tablename__ = "users"
+class User(Base):
+    __tablename__ = "tbl_users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, index=True, nullable=False)
-    name = Column(String(255), nullable=True, unique=False)
-    email = Column(String(255), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(255), nullable=False)
-    role = Column(String(50), default="user")
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str] = mapped_column(unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
+    role: Mapped[str] = mapped_column(nullable=False)  # e.g., 'admin' or 'cashier'
+    date_created: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
+    date_updated: Mapped[datetime] = mapped_column(nullable=True, onupdate=datetime.utcnow)
+
+    def __repr__(self) -> str:
+        return f"<User(id={self.id}, username={self.username}, email={self.email}, role={self.role}), date_created={self.date_created}>"
