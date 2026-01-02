@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from ..database import Base
+from app.database import Base
 
 class Transaction(BaseModel):
     id: str

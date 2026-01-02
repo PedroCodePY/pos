@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 #from sqlalchemy_utils import database_exists, create_database
 import os
 
+#URL for the database connection
 URL_DATABASE = "{}://{}:{}@{}:{}/{}".format(
     os.getenv("DB_ENGINE"),
     os.getenv("DB_USER"),
@@ -11,7 +12,10 @@ URL_DATABASE = "{}://{}:{}@{}:{}/{}".format(
     os.getenv("DB_PORT"),
     os.getenv("DB_NAME"),
 )
+
+#Create the database engine and session
 engine = create_engine(URL_DATABASE, echo=True)
 session = sessionmaker(bind=engine)
 Base = declarative_base()
+
 print(engine.url)

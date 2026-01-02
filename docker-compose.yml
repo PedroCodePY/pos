@@ -1,4 +1,15 @@
 services:
+  postgres:
+    image: postgres:16
+    container_name: pos-db
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   pos-app:
     container_name: pos-app
     build: ./backend
@@ -6,3 +17,8 @@ services:
       - .env
     ports:
       - "6711:8000"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:

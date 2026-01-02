@@ -1,6 +1,6 @@
 #imports
 from fastapi import APIRouter, Path
-from models.user import UserLogin, UserRegister, UserUpdate, CashierLogin, CashierRegister, CashierUpdate
+from app.schemas.user import UserLogin, UserRegister, UserUpdate, CashierLogin, CashierRegister, CashierUpdate
 
 router = APIRouter()
 
