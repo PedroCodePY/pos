@@ -4,15 +4,14 @@ from datetime import datetime
 
 class Product(Base):
     __tablename__ = "tbl_products"
-    __table_args__ = {"extend_existing": True}
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[str] = mapped_column(primary_key=True, unique=True)
     name: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=False)
     price: Mapped[float] = mapped_column(nullable=False)
-    in_stock: Mapped[bool] = mapped_column(nullable=False)
+    in_stock: Mapped[int] = mapped_column(nullable=False)
     product_image: Mapped[str] = mapped_column(nullable=True)
-    owner_id: Mapped[int] = mapped_column(nullable=False)
+    owner_id: Mapped[str] = mapped_column(nullable=False)
     owner: Mapped[str] = mapped_column(nullable=False)
     date_created: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
     date_updated: Mapped[datetime] = mapped_column(nullable=True, onupdate=datetime.utcnow)

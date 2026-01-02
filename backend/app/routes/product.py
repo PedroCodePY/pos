@@ -19,7 +19,7 @@ class system():
             await session.refresh(product)
             return product
     
-    async def get_product(self, async_session: async_sessionmaker[AsyncSession], owner_id: int):
+    async def get_product(self, async_session: async_sessionmaker[AsyncSession], owner_id: str):
         async with async_session() as session:
             statement = select(Product).where(Product.owner_id == owner_id)
             result = await session.execute(statement)

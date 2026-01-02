@@ -29,7 +29,6 @@ class UserRegister(BaseModel):
     name: str
     email: str
     hashed_password: str
-    date_created: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -45,14 +44,14 @@ class UserUpdate(BaseModel):
 #Login Models
 class CashierLogin(BaseModel):
     username: str
-    password: str
+    hashed_password: str
     shop_code: str
 
 #Registration Models
 class CashierRegister(BaseModel):
     username: str
     email: str
-    password: str
+    hashed_password: str
     shop_code: str
 
 #Update Models

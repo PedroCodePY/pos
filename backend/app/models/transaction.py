@@ -4,11 +4,10 @@ from datetime import datetime
 
 class Transaction(Base):
     __tablename__ = "tbl_transactions"
-    __table_args__ = {"extend_existing": True}
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(nullable=False)
-    product_id: Mapped[int] = mapped_column(nullable=False)
+    id: Mapped[str] = mapped_column(primary_key=True, unique=True)
+    user_id: Mapped[str] = mapped_column(nullable=False)
+    product_id: Mapped[str] = mapped_column(nullable=False)
     product_name: Mapped[str] = mapped_column(nullable=False)
     quantity: Mapped[int] = mapped_column(nullable=False)
     total_price: Mapped[float] = mapped_column(nullable=False)

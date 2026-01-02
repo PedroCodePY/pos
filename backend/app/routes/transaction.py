@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.schemas.transaction import Transaction
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-from app.models.transaction import Transaction
+#from app.models.transaction import Transaction
 from sqlalchemy import select
 from app.database import engine
 
