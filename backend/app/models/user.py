@@ -11,7 +11,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     role: Mapped[str] = mapped_column(nullable=False)  # e.g., 'admin' or 'cashier'
-    store_code: Mapped[str] = mapped_column(unique=True)  # Only for cashiers
+    code_shop: Mapped[str] = mapped_column(unique=True)  # Only for cashiers
     date_created: Mapped[datetime] = mapped_column(nullable=False, default=datetime.utcnow)
     date_updated: Mapped[datetime] = mapped_column(nullable=True, onupdate=datetime.utcnow)
 

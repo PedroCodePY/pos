@@ -1,5 +1,5 @@
 #imports
-from fastapi import APIRouter, Body, Path, HTTPException
+from fastapi import APIRouter, Body, Path, HTTPException, status
 from app.schemas.user import UserLogin, UserRegister, UserUpdate, CashierLogin, CashierRegister, CashierUpdate
 from app.models.user import User
 from app.models.store import Store
@@ -23,7 +23,7 @@ class system():
         async with async_session() as session:
             statement = select(Store).where(Store.store_code == store.store_code)
             result = await session.execute(statement)
-            return result
+            return result.scalar.first()
 
     #User
     async def register(self, async_session: async_sessionmaker[AsyncSession], user: User):
@@ -33,14 +33,36 @@ class system():
             await session.refresh(user)
             return user
 
-    async def login(self, async_session: async_sessionmaker[AsyncSession], user: User):
+    async def login_user(self, async_session, username: str, password: str):
         async with async_session() as session:
-            statement = select(User).where(
-                (User.username == user.username) & 
-                (User.hashed_password == user.hashed_password)
+            result = await session.execute(
+                select(User).where(User.username == username)
             )
-            result = await session.execute(statement)
-            return result.scalars().first()
+            user = result.scalars().first()
+
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found",
+                )
+
+            if user.code_shop:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Unauthorized access for cashiers",
+                )
+
+            if not pwd_context.verify(password, user.hashed_password):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Incorrect password or username  ",
+                )
+
+            return {
+                "id": user.id,
+                "username": user.username,
+                "role": user.role
+            }
     
     #Cashier
     async def cashier_register(self, async_session: async_sessionmaker[AsyncSession], user: User):
@@ -52,14 +74,18 @@ class system():
 
     async def cashier_login(self, async_session: async_sessionmaker[AsyncSession], user: User):
         async with async_session() as session:
-            statement = select(User).where(
-                (User.username == user.username) & 
-                (User.hashed_password == user.hashed_password) &
-                (User.role == "cashier") &
-                (User.store_code == user.store_code)
-            )
-            result = await session.execute(statement)
-            return result.scalars().first()
+            store_code = self.check_store_code(session, user.store_code)
+            if not store_code:
+                raise HTTPException(status_code=401, detail="Invalid store code")
+            else:
+                statement = select(User).where(
+                    (User.username == user.username) & 
+                    (User.hashed_password == user.hashed_password) &
+                    (User.role == "cashier") &
+                    (User.store_code == user.store_code)
+                )
+                result = await session.execute(statement)
+                return result.scalars().first()
     
         
 db = system()
@@ -67,28 +93,9 @@ db = system()
 #admin routes
 #Login route
 @router.post("/login", status_code=HTTPStatus.OK)
-async def login(login_data: UserLogin = Body(...)):
-    async with session() as db_session:
-        # Ambil user berdasarkan username
-        result = await db_session.execute(select(User).where(User.username == login_data.username))
-        user = result.scalars().first()
-
-        if not user:
-            raise HTTPException(status_code=401, detail="Invalid username or password")
-
-        # Verifikasi password
-        if not pwd_context.verify(login_data.password, user.hashed_password):
-            raise HTTPException(status_code=401, detail="Invalid username or password")
-
-        # Kalau sukses, return user tanpa password
-        return {
-            "id": str(user.id),
-            "username": user.username,
-            "name": user.name,
-            "email": user.email,
-            "role": user.role,
-            "message": "Login successful"
-        }
+async def login(data: UserLogin = Body(description="User login")):
+    user = await db.login_user(session, data.username, data.password)
+    return user
 
 #Registration route
 @router.post("/register", status_code=HTTPStatus.CREATED)
@@ -117,8 +124,27 @@ def delete_user(user_id: str = Path(description="User ID to delete")):
 #cashier routes
 #Login route
 @router.post("/login/cashiers")
-def login_cashiers(user: CashierLogin = Path(description="Cashier login")):
-    return user, {"message": "Cashiers login successfully"}
+async def login_cashiers(login_data: CashierLogin = Body(description="Cashier login")):
+    async with session() as db_session:
+        result = await db_session.execute(select(User).where(User.username == login_data.username))
+        user = result.scalars().first()
+
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        # Verifikasi password
+        if not pwd_context.verify(login_data.password, user.hashed_password):
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+
+        # Kalau sukses, return user tanpa password
+        return {
+            "id": str(user.id),
+            "username": user.username,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+            "message": "Login successful"
+        }
 
 #Registration route
 @router.post("/register/cashiers")
