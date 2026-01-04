@@ -45,18 +45,22 @@ class UserUpdate(BaseModel):
 class CashierLogin(BaseModel):
     username: str
     hashed_password: str
-    shop_code: str
+    code_shop: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 #Registration Models
 class CashierRegister(BaseModel):
     username: str
+    name: str
     email: str
     hashed_password: str
-    shop_code: str
+    code_shop: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 #Update Models
 class CashierUpdate(BaseModel):
     username: Optional[str] = None
     email: Optional[str] = None
     password: Optional[str] = None
-    shop_code: Optional[str] = None
